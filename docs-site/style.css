@@ -79,7 +79,24 @@
   margin-top: 0;
   color: #000;
   font-weight: bold;
-  font-size: 0.944rem; }
+  font-size: 0.944rem;
+  text-align: left; }
+  .react-datepicker__current-month > div {
+    position: relative;
+    top: -2px;
+    display: inline-block;
+    margin-left: 21px;
+    width: 83px;
+    text-align: center; }
+  .react-datepicker__current-month > input {
+    position: absolute;
+    right: 16px;
+    width: 60px;
+    height: 20px;
+    top: 6px;
+    border-radius: 0;
+    font-weight: 600;
+    text-align: center; }
 
 .react-datepicker__navigation {
   line-height: 1.7rem;
@@ -96,7 +113,7 @@
     .react-datepicker__navigation--previous:hover {
       border-right-color: #b3b3b3; }
   .react-datepicker__navigation--next {
-    right: 10px;
+    left: 104px;
     border-left-color: #ccc; }
     .react-datepicker__navigation--next:hover {
       border-left-color: #b3b3b3; }

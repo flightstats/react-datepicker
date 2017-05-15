@@ -37507,7 +37507,9 @@
 	    get: function get() {
 	      return {
 	        dateFormat: 'L',
-	        dateFormatCalendar: 'MMMM YYYY',
+	        // dateFormat: 'MMM',
+	        // dateFormatCalendar: 'MMMM YYYY',
+	        dateFormatCalendar: 'MMMM',
 	        onChange: function onChange() {},
 
 	        disabled: false,
@@ -37580,20 +37582,13 @@
 	      _this.inputFocusTimeout = null;
 	    };
 
-	    _this.deferFocusInput = function () {
-	      _this.cancelFocusInput();
-	      _this.inputFocusTimeout = window.setTimeout(function () {
-	        return _this.setFocus();
-	      }, 1);
-	    };
-
 	    _this.handleDropdownFocus = function () {
 	      _this.cancelFocusInput();
 	    };
 
 	    _this.handleBlur = function (event) {
 	      if (_this.state.open) {
-	        _this.deferFocusInput();
+	        // this.deferFocusInput()
 	      } else {
 	        _this.props.onBlur(event);
 	      }
@@ -37749,7 +37744,8 @@
 	        {
 	          ref: 'calendar',
 	          locale: _this.props.locale,
-	          dateFormat: _this.props.dateFormatCalendar,
+	          dateFormat: _this.props.dateFormat,
+	          dateFormatCalendar: _this.props.dateFormatCalendar,
 	          dropdownMode: _this.props.dropdownMode,
 	          selected: _this.props.selected,
 	          preSelection: _this.state.preSelection,
@@ -37780,14 +37776,14 @@
 	          monthsShown: _this.props.monthsShown,
 	          onDropdownFocus: _this.handleDropdownFocus,
 	          onMonthChange: _this.props.onMonthChange,
-	          className: _this.props.calendarClassName },
+	          className: _this.props.calendarClassName,
+	          handleInputChange: _this.handleChange },
 	        _this.props.children
 	      );
 	    };
 
 	    _this.renderDateInput = function () {
 	      var className = (0, _classnames3.default)(_this.props.className, _defineProperty({}, outsideClickIgnoreClass, _this.state.open));
-
 	      var customInput = _this.props.customInput || _react2.default.createElement('input', { type: 'text' });
 	      var inputValue = typeof _this.props.value === 'string' ? _this.props.value : typeof _this.state.inputValue === 'string' ? _this.state.inputValue : (0, _date_utils.safeDateFormat)(_this.props.selected, _this.props);
 
@@ -37837,6 +37833,12 @@
 	    value: function componentWillUnmount() {
 	      this.clearPreventFocusTimeout();
 	    }
+
+	    // deferFocusInput = () => {
+	    //   this.cancelFocusInput()
+	    //   this.inputFocusTimeout = window.setTimeout(() => this.setFocus(), 1)
+	    // }
+
 	  }, {
 	    key: 'render',
 	    value: function render() {
@@ -38090,6 +38092,30 @@
 	      });
 	    };
 
+	    _this.handleYearChange = function (newYear) {
+	      var updatedYear = _this.state.date.clone().set('year', newYear);
+	      var _this$props2 = _this.props,
+	          onMonthChange = _this$props2.onMonthChange,
+	          handleInputChange = _this$props2.handleInputChange,
+	          dateFormat = _this$props2.dateFormat;
+
+	      _this.setState({
+	        date: updatedYear
+	      }, function () {
+	        if (onMonthChange) {
+	          onMonthChange(updatedYear);
+	        }
+	        if (handleInputChange) {
+	          var fakeEvent = {
+	            target: {
+	              value: _this.state.date.format(dateFormat)
+	            }
+	          };
+	          _this.props.handleInputChange(fakeEvent);
+	        }
+	      });
+	    };
+
 	    _this.handleDayClick = function (day, event) {
 	      return _this.props.onSelect(day, event);
 	    };
@@ -38106,6 +38132,32 @@
 	      if (_this.props.onMonthChange) {
 	        _this.props.onMonthChange(date);
 	      }
+	    };
+
+	    _this.handleYearInputChange = function (e) {
+	      var _ref = e && e.target,
+	          value = _ref.value;
+
+	      var newYear = +value;
+	      if (!isNaN(newYear)) {
+	        // must be a number
+	        if (value.length === 5) {
+	          // keep replacing the char at the end of the string: we not gonna support dates after 9999
+	          var digits = value.split('');
+	          var endOfString = digits.pop();
+	          digits.pop();
+	          digits.push(endOfString);
+	          value = digits.join('');
+	        }
+	      }
+	      _this.setState({
+	        inputYear: value
+	      }, function () {
+	        if (newYear - 1000 > 0) {
+	          // must also be larger than the year 999
+	          _this.handleYearChange(value);
+	        }
+	      });
 	    };
 
 	    _this.changeYear = function (year) {
@@ -38162,7 +38214,7 @@
 	        onClick: _this.increaseMonth });
 	    };
 
-	    _this.renderCurrentMonth = function () {
+	    _this.renderCurrentMonthHeader = function () {
 	      var date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _this.state.date;
 
 	      var classes = ['react-datepicker__current-month'];
@@ -38176,7 +38228,15 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { className: classes.join(' ') },
-	        date.format(_this.props.dateFormat)
+	        _react2.default.createElement(
+	          'div',
+	          null,
+	          date.format(_this.props.dateFormatCalendar)
+	        ),
+	        _react2.default.createElement('input', {
+	          type: 'text',
+	          value: _this.state.inputYear,
+	          onChange: _this.handleYearInputChange })
 	      );
 	    };
 
@@ -38235,7 +38295,7 @@
 	          _react2.default.createElement(
 	            'div',
 	            { className: 'react-datepicker__header' },
-	            _this.renderCurrentMonth(monthDate),
+	            _this.renderCurrentMonthHeader(monthDate),
 	            _react2.default.createElement(
 	              'div',
 	              {
@@ -38280,7 +38340,8 @@
 
 	    _this.state = {
 	      date: _this.localizeMoment(_this.getDateInView()),
-	      selectingDate: null
+	      selectingDate: null,
+	      inputYear: props.selected.format('YYYY')
 	    };
 	    return _this;
 	  }
@@ -38288,6 +38349,12 @@
 	  _createClass(Calendar, [{
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
+	      var nextSelectedYear = nextProps.selected.format('YYYY');
+	      if (nextSelectedYear !== this.state.inputYear) {
+	        this.setState({
+	          inputYear: nextSelectedYear
+	        });
+	      }
 	      if (nextProps.preSelection && !(0, _date_utils.isSameDay)(nextProps.preSelection, this.props.preSelection)) {
 	        this.setState({
 	          date: this.localizeMoment(nextProps.preSelection)
@@ -38321,11 +38388,13 @@
 	  className: _propTypes2.default.string,
 	  children: _propTypes2.default.node,
 	  dateFormat: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.array]).isRequired,
+	  dateFormatCalendar: _propTypes2.default.string,
 	  dropdownMode: _propTypes2.default.oneOf(['scroll', 'select']).isRequired,
 	  endDate: _propTypes2.default.object,
 	  excludeDates: _propTypes2.default.array,
 	  filterDate: _propTypes2.default.func,
 	  fixedHeight: _propTypes2.default.bool,
+	  handleInputChange: _propTypes2.default.func,
 	  highlightDates: _propTypes2.default.array,
 	  includeDates: _propTypes2.default.array,
 	  inline: _propTypes2.default.bool,
