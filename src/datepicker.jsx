@@ -196,15 +196,12 @@ export default class DatePicker extends React.Component {
   }
 
   handleChange = (event) => {
-    console.log('handle change being called')
     if (this.props.onChangeRaw) {
       this.props.onChangeRaw(event)
       if (event.isDefaultPrevented()) {
         return
       }
     }
-    console.log('event.target.value')
-    console.log(event.target.value)
     this.setState({ inputValue: event.target.value })
     const date = parseDate(event.target.value, this.props)
     if (date || !event.target.value) {
