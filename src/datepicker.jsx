@@ -81,7 +81,9 @@ export default class DatePicker extends React.Component {
   static get defaultProps () {
     return {
       dateFormat: 'L',
-      dateFormatCalendar: 'MMMM YYYY',
+      // dateFormat: 'MMM',
+      // dateFormatCalendar: 'MMMM YYYY',
+      dateFormatCalendar: 'MMMM',
       onChange () {},
       disabled: false,
       disabledKeyboardNavigation: false,
@@ -170,10 +172,10 @@ export default class DatePicker extends React.Component {
     this.inputFocusTimeout = null
   }
 
-  deferFocusInput = () => {
-    this.cancelFocusInput()
-    this.inputFocusTimeout = window.setTimeout(() => this.setFocus(), 1)
-  }
+  // deferFocusInput = () => {
+  //   this.cancelFocusInput()
+  //   this.inputFocusTimeout = window.setTimeout(() => this.setFocus(), 1)
+  // }
 
   handleDropdownFocus = () => {
     this.cancelFocusInput()
@@ -181,7 +183,7 @@ export default class DatePicker extends React.Component {
 
   handleBlur = (event) => {
     if (this.state.open) {
-      this.deferFocusInput()
+      // this.deferFocusInput()
     } else {
       this.props.onBlur(event)
     }
@@ -194,12 +196,15 @@ export default class DatePicker extends React.Component {
   }
 
   handleChange = (event) => {
+    console.log('handle change being called')
     if (this.props.onChangeRaw) {
       this.props.onChangeRaw(event)
       if (event.isDefaultPrevented()) {
         return
       }
     }
+    console.log('event.target.value')
+    console.log(event.target.value)
     this.setState({ inputValue: event.target.value })
     const date = parseDate(event.target.value, this.props)
     if (date || !event.target.value) {
@@ -333,7 +338,8 @@ export default class DatePicker extends React.Component {
     return <WrappedCalendar
         ref="calendar"
         locale={this.props.locale}
-        dateFormat={this.props.dateFormatCalendar}
+        dateFormat={this.props.dateFormat}
+        dateFormatCalendar={this.props.dateFormatCalendar}
         dropdownMode={this.props.dropdownMode}
         selected={this.props.selected}
         preSelection={this.state.preSelection}
@@ -364,7 +370,8 @@ export default class DatePicker extends React.Component {
         monthsShown={this.props.monthsShown}
         onDropdownFocus={this.handleDropdownFocus}
         onMonthChange={this.props.onMonthChange}
-        className={this.props.calendarClassName}>
+        className={this.props.calendarClassName}
+        handleInputChange={this.handleChange}>
       {this.props.children}
     </WrappedCalendar>
   }
@@ -373,7 +380,6 @@ export default class DatePicker extends React.Component {
     var className = classnames(this.props.className, {
       [outsideClickIgnoreClass]: this.state.open
     })
-
     const customInput = this.props.customInput || <input type="text" />
     const inputValue =
       typeof this.props.value === 'string' ? this.props.value
