@@ -73,11 +73,18 @@ export default class Calendar extends React.Component {
 
     this.state = {
       date: this.localizeMoment(this.getDateInView()),
-      selectingDate: null
+      selectingDate: null,
+      inputYear: props.selected.format('YYYY')
     }
   }
 
   componentWillReceiveProps (nextProps) {
+    const nextSelectedYear = nextProps.selected.format('YYYY')
+    if (nextSelectedYear !== this.state.inputYear) {
+      this.setState({
+        inputYear: nextSelectedYear
+      })
+    }
     if (nextProps.preSelection && !isSameDay(nextProps.preSelection, this.props.preSelection)) {
       this.setState({
         date: this.localizeMoment(nextProps.preSelection)
@@ -144,7 +151,6 @@ export default class Calendar extends React.Component {
     this.setState({
       date: updatedYear
     }, () => {
-      console.log('inside second callback of setState')
       if (onMonthChange) {
         onMonthChange(updatedYear)
       }
@@ -184,15 +190,15 @@ export default class Calendar extends React.Component {
         digits.push(endOfString)
         value = digits.join('')
       }
-      this.setState({
-        inputYear: value
-      }, () => {
-        if (newYear - 1000 > 0) {
-          // must also be larger than the year 999
-          this.handleYearChange(value)
-        }
-      })
     }
+    this.setState({
+      inputYear: value
+    }, () => {
+      if (newYear - 1000 > 0) {
+        // must also be larger than the year 999
+        this.handleYearChange(value)
+      }
+    })
   }
 
   changeYear = (year) => {
@@ -261,7 +267,7 @@ export default class Calendar extends React.Component {
         </div>
         <input
             type="text"
-            value={this.props.selected.format('YYYY')}
+            value={this.state.inputYear}
             onChange={this.handleYearInputChange}/>
       </div>
     )
