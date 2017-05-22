@@ -20,7 +20,7 @@ describe('DatePicker', () => {
     sandbox.restore()
   })
 
-  xit('should show the calendar when focusing on the date input', () => {
+  it('should show the calendar when focusing on the date input', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker />
     )
@@ -29,7 +29,7 @@ describe('DatePicker', () => {
     expect(datePicker.refs.calendar).to.exist
   })
 
-  xit('should show the calendar when clicking on the date input', () => {
+  it('should show the calendar when clicking on the date input', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker />
     )
@@ -47,7 +47,7 @@ describe('DatePicker', () => {
     expect(datePicker.state.open).to.be.false
   })
 
-  xit('should render the calendar into a specified node', () => {
+  it('should render the calendar into a specified node', () => {
     var node = document.createElement('div')
     document.body.appendChild(node)
     var datePicker = TestUtils.renderIntoDocument(
@@ -101,7 +101,7 @@ describe('DatePicker', () => {
     })
   })
 
-  xit('should keep the calendar shown when clicking the calendar', () => {
+  it('should keep the calendar shown when clicking the calendar', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker />
     )
@@ -120,7 +120,7 @@ describe('DatePicker', () => {
     expect(datePicker.state.open).to.be.false
   })
 
-  xit('should hide the calendar when clicking a day on the calendar', () => {
+  it('should hide the calendar when clicking a day on the calendar', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker />
     )
@@ -131,7 +131,7 @@ describe('DatePicker', () => {
     expect(datePicker.refs.calendar).to.not.exist
   })
 
-  xit('should hide the calendar when the pressing enter in the date input', () => {
+  it('should hide the calendar when the pressing enter in the date input', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker />
     )
@@ -141,7 +141,7 @@ describe('DatePicker', () => {
     expect(datePicker.refs.calendar).to.not.exist
   })
 
-  xit('should hide the calendar when the pressing escape in the date input', () => {
+  it('should hide the calendar when the pressing escape in the date input', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker />
     )
@@ -151,7 +151,7 @@ describe('DatePicker', () => {
     expect(datePicker.refs.calendar).to.not.exist
   })
 
-  xit('should hide the calendar when tabbing from the date input', () => {
+  it('should hide the calendar when tabbing from the date input', () => {
     var onBlurSpy = sandbox.spy()
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker onBlur={onBlurSpy} />
@@ -240,7 +240,7 @@ describe('DatePicker', () => {
     expect(function () { TestUtils.findRenderedComponentWithType(datePicker, TetherComponent) }).to.not.throw()
   })
 
-  xit('should render calendar directly without TetherComponent when inline prop is set', () => {
+  it('should render calendar directly without TetherComponent when inline prop is set', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker inline />
     )
@@ -249,7 +249,7 @@ describe('DatePicker', () => {
     expect(datePicker.refs.calendar).to.exist
   })
 
-  xit('should ignore disable prop when inline prop is set', () => {
+  it('should ignore disable prop when inline prop is set', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker inline disabled />
     )
@@ -257,7 +257,7 @@ describe('DatePicker', () => {
     expect(datePicker.refs.calendar).to.exist
   })
 
-  xit('should render Calendar in portal when withPortal is set and input has focus', () => {
+  it('should render Calendar in portal when withPortal is set and input has focus', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker withPortal />
     )
