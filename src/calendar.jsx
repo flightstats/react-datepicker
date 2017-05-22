@@ -74,7 +74,7 @@ export default class Calendar extends React.Component {
     this.state = {
       date: this.localizeMoment(this.getDateInView()),
       selectingDate: null,
-      inputYear: props.selected.format('YYYY')
+      inputYear: props.selected && props.selected.format('YYYY')
     }
   }
 
