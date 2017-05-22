@@ -19,13 +19,13 @@ describe('Multi month calendar', function () {
       )
   }
 
-  xit('should render multiple months if the months property is present', () => {
+  it('should render multiple months if the months property is present', () => {
     var calendar = getCalendar({monthsShown: 2})
     var months = calendar.find(Month)
     expect(months).to.have.length(2)
   })
 
-  xit('should render dropdown only on first month', () => {
+  it('should render dropdown only on first month', () => {
     var calendar = getCalendar({monthsShown: 2, showYearDropdown: true})
     var datepickers = calendar.find(YearDropdown)
     expect(datepickers).to.have.length(1)
