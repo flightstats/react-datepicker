@@ -71,27 +71,26 @@ export default class Calendar extends React.Component {
   constructor (props) {
     super(props)
 
+    const date = this.localizeMoment(this.getDateInView())
     this.state = {
-      date: this.localizeMoment(this.getDateInView()),
+      date,
       selectingDate: null,
-      inputYear: props.selected && props.selected.format('YYYY')
+      inputYear: date.format('Y')
     }
   }
 
   componentWillReceiveProps (nextProps) {
-    const nextSelectedYear = nextProps.selected.format('YYYY')
-    if (nextSelectedYear !== this.state.inputYear) {
-      this.setState({
-        inputYear: nextSelectedYear
-      })
-    }
     if (nextProps.preSelection && !isSameDay(nextProps.preSelection, this.props.preSelection)) {
+      const date = this.localizeMoment(nextProps.preSelection)
       this.setState({
-        date: this.localizeMoment(nextProps.preSelection)
+        date,
+        inputYear: date.format('Y')
       })
     } else if (nextProps.openToDate && !isSameDay(nextProps.openToDate, this.props.openToDate)) {
+      const date = this.localizeMoment(nextProps.openToDate)
       this.setState({
-        date: this.localizeMoment(nextProps.openToDate)
+        date,
+        inputYear: date.format('Y')
       })
     }
   }
@@ -180,25 +179,27 @@ export default class Calendar extends React.Component {
   handleYearInputChange = (e) => {
     let {value} = (e && e.target)
     const newYear = +value
+
     if (!isNaN(newYear)) {
-      // must be a number
-      if (value.length === 5) {
-        // keep replacing the char at the end of the string: we not gonna support dates after 9999
-        const digits = value.split('')
-        const endOfString = digits.pop()
-        digits.pop()
-        digits.push(endOfString)
-        value = digits.join('')
-      }
+      const momentizedNewYear = this.state.date.clone().set('year', newYear)
+      this.setState({
+        inputYear: momentizedNewYear.format('Y')
+      }, () => {
+        if (newYear > 999 && newYear < 10000) {
+          // update acalendar on years that are four digits long
+          const { minDate, maxDate } = this.props
+          const validMinCheck = minDate && minDate.isBefore(momentizedNewYear)
+          const validMaxCheck = maxDate && maxDate.isAfter(momentizedNewYear)
+          if (!minDate && !maxDate) {
+            // no constraints on calendar
+            this.handleYearChange(newYear)
+          }
+          if (validMinCheck || validMaxCheck) {
+            this.handleYearChange(newYear)
+          }
+        }
+      })
     }
-    this.setState({
-      inputYear: value
-    }, () => {
-      if (newYear - 1000 > 0) {
-        // must also be larger than the year 999
-        this.handleYearChange(value)
-      }
-    })
   }
 
   changeYear = (year) => {
