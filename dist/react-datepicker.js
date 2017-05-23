@@ -642,316 +642,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var _this = _possibleConstructorReturn(this, (Calendar.__proto__ || Object.getPrototypeOf(Calendar)).call(this, props));
 
-	    _this.handleClickOutside = function (event) {
-	      _this.props.onClickOutside(event);
-	    };
+	    _initialiseProps.call(_this);
 
-	    _this.handleDropdownFocus = function (event) {
-	      if (isDropdownSelect(event.target)) {
-	        _this.props.onDropdownFocus();
-	      }
-	    };
-
-	    _this.getDateInView = function () {
-	      var _this$props = _this.props,
-	          preSelection = _this$props.preSelection,
-	          selected = _this$props.selected,
-	          openToDate = _this$props.openToDate,
-	          utcOffset = _this$props.utcOffset;
-
-	      var minDate = (0, _date_utils.getEffectiveMinDate)(_this.props);
-	      var maxDate = (0, _date_utils.getEffectiveMaxDate)(_this.props);
-	      var current = _moment2.default.utc().utcOffset(utcOffset);
-	      var initialDate = preSelection || selected;
-	      if (initialDate) {
-	        return initialDate;
-	      } else if (minDate && maxDate && openToDate && openToDate.isBetween(minDate, maxDate)) {
-	        return openToDate;
-	      } else if (minDate && openToDate && openToDate.isAfter(minDate)) {
-	        return openToDate;
-	      } else if (minDate && minDate.isAfter(current)) {
-	        return minDate;
-	      } else if (maxDate && openToDate && openToDate.isBefore(maxDate)) {
-	        return openToDate;
-	      } else if (maxDate && maxDate.isBefore(current)) {
-	        return maxDate;
-	      } else if (openToDate) {
-	        return openToDate;
-	      } else {
-	        return current;
-	      }
-	    };
-
-	    _this.localizeMoment = function (date) {
-	      return date.clone().locale(_this.props.locale || _moment2.default.locale());
-	    };
-
-	    _this.increaseMonth = function () {
-	      _this.setState({
-	        date: _this.state.date.clone().add(1, 'month')
-	      }, function () {
-	        return _this.handleMonthChange(_this.state.date);
-	      });
-	    };
-
-	    _this.decreaseMonth = function () {
-	      _this.setState({
-	        date: _this.state.date.clone().subtract(1, 'month')
-	      }, function () {
-	        return _this.handleMonthChange(_this.state.date);
-	      });
-	    };
-
-	    _this.handleYearChange = function (newYear) {
-	      var updatedYear = _this.state.date.clone().set('year', newYear);
-	      var _this$props2 = _this.props,
-	          onMonthChange = _this$props2.onMonthChange,
-	          handleInputChange = _this$props2.handleInputChange,
-	          dateFormat = _this$props2.dateFormat;
-
-	      _this.setState({
-	        date: updatedYear
-	      }, function () {
-	        if (onMonthChange) {
-	          onMonthChange(updatedYear);
-	        }
-	        if (handleInputChange) {
-	          var fakeEvent = {
-	            target: {
-	              value: _this.state.date.format(dateFormat)
-	            }
-	          };
-	          _this.props.handleInputChange(fakeEvent);
-	        }
-	      });
-	    };
-
-	    _this.handleDayClick = function (day, event) {
-	      return _this.props.onSelect(day, event);
-	    };
-
-	    _this.handleDayMouseEnter = function (day) {
-	      return _this.setState({ selectingDate: day });
-	    };
-
-	    _this.handleMonthMouseLeave = function () {
-	      return _this.setState({ selectingDate: null });
-	    };
-
-	    _this.handleMonthChange = function (date) {
-	      if (_this.props.onMonthChange) {
-	        _this.props.onMonthChange(date);
-	      }
-	    };
-
-	    _this.handleYearInputChange = function (e) {
-	      var _ref = e && e.target,
-	          value = _ref.value;
-
-	      var newYear = +value;
-	      if (!isNaN(newYear)) {
-	        // must be a number
-	        if (value.length === 5) {
-	          // keep replacing the char at the end of the string: we not gonna support dates after 9999
-	          var digits = value.split('');
-	          var endOfString = digits.pop();
-	          digits.pop();
-	          digits.push(endOfString);
-	          value = digits.join('');
-	        }
-	      }
-	      _this.setState({
-	        inputYear: value
-	      }, function () {
-	        if (newYear - 1000 > 0) {
-	          // must also be larger than the year 999
-	          _this.handleYearChange(value);
-	        }
-	      });
-	    };
-
-	    _this.changeYear = function (year) {
-	      _this.setState({
-	        date: _this.state.date.clone().set('year', year)
-	      });
-	    };
-
-	    _this.changeMonth = function (month) {
-	      _this.setState({
-	        date: _this.state.date.clone().set('month', month)
-	      }, function () {
-	        return _this.handleMonthChange(_this.state.date);
-	      });
-	    };
-
-	    _this.header = function () {
-	      var date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _this.state.date;
-
-	      var startOfWeek = date.clone().startOf('week');
-	      var dayNames = [];
-	      if (_this.props.showWeekNumbers) {
-	        dayNames.push(_react2.default.createElement(
-	          'div',
-	          { key: 'W', className: 'react-datepicker__day-name' },
-	          '#'
-	        ));
-	      }
-	      return dayNames.concat([0, 1, 2, 3, 4, 5, 6].map(function (offset) {
-	        var day = startOfWeek.clone().add(offset, 'days');
-	        return _react2.default.createElement(
-	          'div',
-	          { key: offset, className: 'react-datepicker__day-name' },
-	          day.localeData().weekdaysMin(day)
-	        );
-	      }));
-	    };
-
-	    _this.renderPreviousMonthButton = function () {
-	      if (!_this.props.forceShowMonthNavigation && (0, _date_utils.allDaysDisabledBefore)(_this.state.date, 'month', _this.props)) {
-	        return;
-	      }
-	      return _react2.default.createElement('a', {
-	        className: 'react-datepicker__navigation react-datepicker__navigation--previous',
-	        onClick: _this.decreaseMonth });
-	    };
-
-	    _this.renderNextMonthButton = function () {
-	      if (!_this.props.forceShowMonthNavigation && (0, _date_utils.allDaysDisabledAfter)(_this.state.date, 'month', _this.props)) {
-	        return;
-	      }
-	      return _react2.default.createElement('a', {
-	        className: 'react-datepicker__navigation react-datepicker__navigation--next',
-	        onClick: _this.increaseMonth });
-	    };
-
-	    _this.renderCurrentMonthHeader = function () {
-	      var date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _this.state.date;
-
-	      var classes = ['react-datepicker__current-month'];
-
-	      if (_this.props.showYearDropdown) {
-	        classes.push('react-datepicker__current-month--hasYearDropdown');
-	      }
-	      if (_this.props.showMonthDropdown) {
-	        classes.push('react-datepicker__current-month--hasMonthDropdown');
-	      }
-	      return _react2.default.createElement(
-	        'div',
-	        { className: classes.join(' ') },
-	        _react2.default.createElement(
-	          'div',
-	          null,
-	          date.format(_this.props.dateFormatCalendar)
-	        ),
-	        _react2.default.createElement('input', {
-	          type: 'text',
-	          value: _this.state.inputYear,
-	          onChange: _this.handleYearInputChange })
-	      );
-	    };
-
-	    _this.renderYearDropdown = function () {
-	      var overrideHide = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-	      if (!_this.props.showYearDropdown || overrideHide) {
-	        return;
-	      }
-	      return _react2.default.createElement(_year_dropdown2.default, {
-	        dropdownMode: _this.props.dropdownMode,
-	        onChange: _this.changeYear,
-	        minDate: _this.props.minDate,
-	        maxDate: _this.props.maxDate,
-	        year: _this.state.date.year(),
-	        scrollableYearDropdown: _this.props.scrollableYearDropdown });
-	    };
-
-	    _this.renderMonthDropdown = function () {
-	      var overrideHide = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-	      if (!_this.props.showMonthDropdown) {
-	        return;
-	      }
-	      return _react2.default.createElement(_month_dropdown2.default, {
-	        dropdownMode: _this.props.dropdownMode,
-	        locale: _this.props.locale,
-	        dateFormat: _this.props.dateFormat,
-	        onChange: _this.changeMonth,
-	        month: _this.state.date.month() });
-	    };
-
-	    _this.renderTodayButton = function () {
-	      if (!_this.props.todayButton) {
-	        return;
-	      }
-	      return _react2.default.createElement(
-	        'div',
-	        {
-	          className: 'react-datepicker__today-button',
-	          onClick: function onClick(e) {
-	            return _this.props.onSelect(_moment2.default.utc().utcOffset(_this.props.utcOffset).startOf('date'), e);
-	          } },
-	        _this.props.todayButton
-	      );
-	    };
-
-	    _this.renderMonths = function () {
-	      var monthList = [];
-	      for (var i = 0; i < _this.props.monthsShown; ++i) {
-	        var monthDate = _this.state.date.clone().add(i, 'M');
-	        var monthKey = 'month-' + i;
-	        monthList.push(_react2.default.createElement(
-	          'div',
-	          { key: monthKey, className: 'react-datepicker__month-container' },
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'react-datepicker__header' },
-	            _this.renderCurrentMonthHeader(monthDate),
-	            _react2.default.createElement(
-	              'div',
-	              {
-	                className: 'react-datepicker__header__dropdown react-datepicker__header__dropdown--' + _this.props.dropdownMode,
-	                onFocus: _this.handleDropdownFocus },
-	              _this.renderMonthDropdown(i !== 0),
-	              _this.renderYearDropdown(i !== 0)
-	            ),
-	            _react2.default.createElement(
-	              'div',
-	              { className: 'react-datepicker__day-names' },
-	              _this.header(monthDate)
-	            )
-	          ),
-	          _react2.default.createElement(_month2.default, {
-	            day: monthDate,
-	            onDayClick: _this.handleDayClick,
-	            onDayMouseEnter: _this.handleDayMouseEnter,
-	            onMouseLeave: _this.handleMonthMouseLeave,
-	            minDate: _this.props.minDate,
-	            maxDate: _this.props.maxDate,
-	            excludeDates: _this.props.excludeDates,
-	            highlightDates: _this.props.highlightDates,
-	            selectingDate: _this.state.selectingDate,
-	            includeDates: _this.props.includeDates,
-	            inline: _this.props.inline,
-	            fixedHeight: _this.props.fixedHeight,
-	            filterDate: _this.props.filterDate,
-	            preSelection: _this.props.preSelection,
-	            selected: _this.props.selected,
-	            selectsStart: _this.props.selectsStart,
-	            selectsEnd: _this.props.selectsEnd,
-	            showWeekNumbers: _this.props.showWeekNumbers,
-	            startDate: _this.props.startDate,
-	            endDate: _this.props.endDate,
-	            peekNextMonth: _this.props.peekNextMonth,
-	            utcOffset: _this.props.utcOffset })
-	        ));
-	      }
-	      return monthList;
-	    };
-
+	    var date = _this.localizeMoment(_this.getDateInView());
 	    _this.state = {
-	      date: _this.localizeMoment(_this.getDateInView()),
+	      date: date,
 	      selectingDate: null,
-	      inputYear: props.selected && props.selected.format('YYYY')
+	      inputYear: date.format('Y')
 	    };
 	    return _this;
 	  }
@@ -959,19 +656,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(Calendar, [{
 	    key: 'componentWillReceiveProps',
 	    value: function componentWillReceiveProps(nextProps) {
-	      var nextSelectedYear = nextProps.selected.format('YYYY');
-	      if (nextSelectedYear !== this.state.inputYear) {
-	        this.setState({
-	          inputYear: nextSelectedYear
-	        });
-	      }
 	      if (nextProps.preSelection && !(0, _date_utils.isSameDay)(nextProps.preSelection, this.props.preSelection)) {
+	        var date = this.localizeMoment(nextProps.preSelection);
 	        this.setState({
-	          date: this.localizeMoment(nextProps.preSelection)
+	          date: date,
+	          inputYear: date.format('Y')
 	        });
 	      } else if (nextProps.openToDate && !(0, _date_utils.isSameDay)(nextProps.openToDate, this.props.openToDate)) {
+	        var _date = this.localizeMoment(nextProps.openToDate);
 	        this.setState({
-	          date: this.localizeMoment(nextProps.openToDate)
+	          date: _date,
+	          inputYear: _date.format('Y')
 	        });
 	      }
 	    }
@@ -1031,6 +726,322 @@ return /******/ (function(modules) { // webpackBootstrap
 	  todayButton: _propTypes2.default.string,
 	  utcOffset: _propTypes2.default.number
 	};
+
+	var _initialiseProps = function _initialiseProps() {
+	  var _this2 = this;
+
+	  this.handleClickOutside = function (event) {
+	    _this2.props.onClickOutside(event);
+	  };
+
+	  this.handleDropdownFocus = function (event) {
+	    if (isDropdownSelect(event.target)) {
+	      _this2.props.onDropdownFocus();
+	    }
+	  };
+
+	  this.getDateInView = function () {
+	    var _props = _this2.props,
+	        preSelection = _props.preSelection,
+	        selected = _props.selected,
+	        openToDate = _props.openToDate,
+	        utcOffset = _props.utcOffset;
+
+	    var minDate = (0, _date_utils.getEffectiveMinDate)(_this2.props);
+	    var maxDate = (0, _date_utils.getEffectiveMaxDate)(_this2.props);
+	    var current = _moment2.default.utc().utcOffset(utcOffset);
+	    var initialDate = preSelection || selected;
+	    if (initialDate) {
+	      return initialDate;
+	    } else if (minDate && maxDate && openToDate && openToDate.isBetween(minDate, maxDate)) {
+	      return openToDate;
+	    } else if (minDate && openToDate && openToDate.isAfter(minDate)) {
+	      return openToDate;
+	    } else if (minDate && minDate.isAfter(current)) {
+	      return minDate;
+	    } else if (maxDate && openToDate && openToDate.isBefore(maxDate)) {
+	      return openToDate;
+	    } else if (maxDate && maxDate.isBefore(current)) {
+	      return maxDate;
+	    } else if (openToDate) {
+	      return openToDate;
+	    } else {
+	      return current;
+	    }
+	  };
+
+	  this.localizeMoment = function (date) {
+	    return date.clone().locale(_this2.props.locale || _moment2.default.locale());
+	  };
+
+	  this.increaseMonth = function () {
+	    _this2.setState({
+	      date: _this2.state.date.clone().add(1, 'month')
+	    }, function () {
+	      return _this2.handleMonthChange(_this2.state.date);
+	    });
+	  };
+
+	  this.decreaseMonth = function () {
+	    _this2.setState({
+	      date: _this2.state.date.clone().subtract(1, 'month')
+	    }, function () {
+	      return _this2.handleMonthChange(_this2.state.date);
+	    });
+	  };
+
+	  this.handleYearChange = function (newYear) {
+	    var updatedYear = _this2.state.date.clone().set('year', newYear);
+	    var _props2 = _this2.props,
+	        onMonthChange = _props2.onMonthChange,
+	        handleInputChange = _props2.handleInputChange,
+	        dateFormat = _props2.dateFormat;
+
+	    _this2.setState({
+	      date: updatedYear
+	    }, function () {
+	      if (onMonthChange) {
+	        onMonthChange(updatedYear);
+	      }
+	      if (handleInputChange) {
+	        var fakeEvent = {
+	          target: {
+	            value: _this2.state.date.format(dateFormat)
+	          }
+	        };
+	        _this2.props.handleInputChange(fakeEvent);
+	      }
+	    });
+	  };
+
+	  this.handleDayClick = function (day, event) {
+	    return _this2.props.onSelect(day, event);
+	  };
+
+	  this.handleDayMouseEnter = function (day) {
+	    return _this2.setState({ selectingDate: day });
+	  };
+
+	  this.handleMonthMouseLeave = function () {
+	    return _this2.setState({ selectingDate: null });
+	  };
+
+	  this.handleMonthChange = function (date) {
+	    if (_this2.props.onMonthChange) {
+	      _this2.props.onMonthChange(date);
+	    }
+	  };
+
+	  this.handleYearInputChange = function (e) {
+	    var _ref = e && e.target,
+	        value = _ref.value;
+
+	    var newYear = +value;
+
+	    if (!isNaN(newYear)) {
+	      var momentizedNewYear = _this2.state.date.clone().set('year', newYear);
+	      _this2.setState({
+	        inputYear: momentizedNewYear.format('Y')
+	      }, function () {
+	        if (newYear > 999 && newYear < 10000) {
+	          // update acalendar on years that are four digits long
+	          var _props3 = _this2.props,
+	              minDate = _props3.minDate,
+	              maxDate = _props3.maxDate;
+
+	          var validMinCheck = minDate && minDate.isBefore(momentizedNewYear);
+	          var validMaxCheck = maxDate && maxDate.isAfter(momentizedNewYear);
+	          if (!minDate && !maxDate) {
+	            // no constraints on calendar
+	            _this2.handleYearChange(newYear);
+	          }
+	          if (validMinCheck || validMaxCheck) {
+	            _this2.handleYearChange(newYear);
+	          }
+	        }
+	      });
+	    }
+	  };
+
+	  this.changeYear = function (year) {
+	    _this2.setState({
+	      date: _this2.state.date.clone().set('year', year)
+	    });
+	  };
+
+	  this.changeMonth = function (month) {
+	    _this2.setState({
+	      date: _this2.state.date.clone().set('month', month)
+	    }, function () {
+	      return _this2.handleMonthChange(_this2.state.date);
+	    });
+	  };
+
+	  this.header = function () {
+	    var date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _this2.state.date;
+
+	    var startOfWeek = date.clone().startOf('week');
+	    var dayNames = [];
+	    if (_this2.props.showWeekNumbers) {
+	      dayNames.push(_react2.default.createElement(
+	        'div',
+	        { key: 'W', className: 'react-datepicker__day-name' },
+	        '#'
+	      ));
+	    }
+	    return dayNames.concat([0, 1, 2, 3, 4, 5, 6].map(function (offset) {
+	      var day = startOfWeek.clone().add(offset, 'days');
+	      return _react2.default.createElement(
+	        'div',
+	        { key: offset, className: 'react-datepicker__day-name' },
+	        day.localeData().weekdaysMin(day)
+	      );
+	    }));
+	  };
+
+	  this.renderPreviousMonthButton = function () {
+	    if (!_this2.props.forceShowMonthNavigation && (0, _date_utils.allDaysDisabledBefore)(_this2.state.date, 'month', _this2.props)) {
+	      return;
+	    }
+	    return _react2.default.createElement('a', {
+	      className: 'react-datepicker__navigation react-datepicker__navigation--previous',
+	      onClick: _this2.decreaseMonth });
+	  };
+
+	  this.renderNextMonthButton = function () {
+	    if (!_this2.props.forceShowMonthNavigation && (0, _date_utils.allDaysDisabledAfter)(_this2.state.date, 'month', _this2.props)) {
+	      return;
+	    }
+	    return _react2.default.createElement('a', {
+	      className: 'react-datepicker__navigation react-datepicker__navigation--next',
+	      onClick: _this2.increaseMonth });
+	  };
+
+	  this.renderCurrentMonthHeader = function () {
+	    var date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _this2.state.date;
+
+	    var classes = ['react-datepicker__current-month'];
+
+	    if (_this2.props.showYearDropdown) {
+	      classes.push('react-datepicker__current-month--hasYearDropdown');
+	    }
+	    if (_this2.props.showMonthDropdown) {
+	      classes.push('react-datepicker__current-month--hasMonthDropdown');
+	    }
+	    return _react2.default.createElement(
+	      'div',
+	      { className: classes.join(' ') },
+	      _react2.default.createElement(
+	        'div',
+	        null,
+	        date.format(_this2.props.dateFormatCalendar)
+	      ),
+	      _react2.default.createElement('input', {
+	        type: 'text',
+	        value: _this2.state.inputYear,
+	        onChange: _this2.handleYearInputChange })
+	    );
+	  };
+
+	  this.renderYearDropdown = function () {
+	    var overrideHide = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+	    if (!_this2.props.showYearDropdown || overrideHide) {
+	      return;
+	    }
+	    return _react2.default.createElement(_year_dropdown2.default, {
+	      dropdownMode: _this2.props.dropdownMode,
+	      onChange: _this2.changeYear,
+	      minDate: _this2.props.minDate,
+	      maxDate: _this2.props.maxDate,
+	      year: _this2.state.date.year(),
+	      scrollableYearDropdown: _this2.props.scrollableYearDropdown });
+	  };
+
+	  this.renderMonthDropdown = function () {
+	    var overrideHide = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+	    if (!_this2.props.showMonthDropdown) {
+	      return;
+	    }
+	    return _react2.default.createElement(_month_dropdown2.default, {
+	      dropdownMode: _this2.props.dropdownMode,
+	      locale: _this2.props.locale,
+	      dateFormat: _this2.props.dateFormat,
+	      onChange: _this2.changeMonth,
+	      month: _this2.state.date.month() });
+	  };
+
+	  this.renderTodayButton = function () {
+	    if (!_this2.props.todayButton) {
+	      return;
+	    }
+	    return _react2.default.createElement(
+	      'div',
+	      {
+	        className: 'react-datepicker__today-button',
+	        onClick: function onClick(e) {
+	          return _this2.props.onSelect(_moment2.default.utc().utcOffset(_this2.props.utcOffset).startOf('date'), e);
+	        } },
+	      _this2.props.todayButton
+	    );
+	  };
+
+	  this.renderMonths = function () {
+	    var monthList = [];
+	    for (var i = 0; i < _this2.props.monthsShown; ++i) {
+	      var monthDate = _this2.state.date.clone().add(i, 'M');
+	      var monthKey = 'month-' + i;
+	      monthList.push(_react2.default.createElement(
+	        'div',
+	        { key: monthKey, className: 'react-datepicker__month-container' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'react-datepicker__header' },
+	          _this2.renderCurrentMonthHeader(monthDate),
+	          _react2.default.createElement(
+	            'div',
+	            {
+	              className: 'react-datepicker__header__dropdown react-datepicker__header__dropdown--' + _this2.props.dropdownMode,
+	              onFocus: _this2.handleDropdownFocus },
+	            _this2.renderMonthDropdown(i !== 0),
+	            _this2.renderYearDropdown(i !== 0)
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'react-datepicker__day-names' },
+	            _this2.header(monthDate)
+	          )
+	        ),
+	        _react2.default.createElement(_month2.default, {
+	          day: monthDate,
+	          onDayClick: _this2.handleDayClick,
+	          onDayMouseEnter: _this2.handleDayMouseEnter,
+	          onMouseLeave: _this2.handleMonthMouseLeave,
+	          minDate: _this2.props.minDate,
+	          maxDate: _this2.props.maxDate,
+	          excludeDates: _this2.props.excludeDates,
+	          highlightDates: _this2.props.highlightDates,
+	          selectingDate: _this2.state.selectingDate,
+	          includeDates: _this2.props.includeDates,
+	          inline: _this2.props.inline,
+	          fixedHeight: _this2.props.fixedHeight,
+	          filterDate: _this2.props.filterDate,
+	          preSelection: _this2.props.preSelection,
+	          selected: _this2.props.selected,
+	          selectsStart: _this2.props.selectsStart,
+	          selectsEnd: _this2.props.selectsEnd,
+	          showWeekNumbers: _this2.props.showWeekNumbers,
+	          startDate: _this2.props.startDate,
+	          endDate: _this2.props.endDate,
+	          peekNextMonth: _this2.props.peekNextMonth,
+	          utcOffset: _this2.props.utcOffset })
+	      ));
+	    }
+	    return monthList;
+	  };
+	};
+
 	exports.default = Calendar;
 
 /***/ }),
