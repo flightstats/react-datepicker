@@ -193,8 +193,14 @@ export default class Calendar extends React.Component {
           if (!minDate && !maxDate) {
             // no constraints on calendar
             this.handleYearChange(newYear)
-          }
-          if (validMinCheck || validMaxCheck) {
+          } else if (validMinCheck && validMaxCheck) {
+            // both constraints present and passing
+            this.handleYearChange(newYear)
+          } else if (minDate && validMinCheck) {
+            // good min
+            this.handleYearChange(newYear)
+          } else if (maxDate && validMaxCheck) {
+            // good max
             this.handleYearChange(newYear)
           }
         }
