@@ -854,8 +854,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (!minDate && !maxDate) {
 	            // no constraints on calendar
 	            _this2.handleYearChange(newYear);
-	          }
-	          if (validMinCheck || validMaxCheck) {
+	          } else if (validMinCheck && validMaxCheck) {
+	            // both constraints present and passing
+	            _this2.handleYearChange(newYear);
+	          } else if (minDate && validMinCheck) {
+	            // good min
+	            _this2.handleYearChange(newYear);
+	          } else if (maxDate && validMaxCheck) {
+	            // good max
 	            _this2.handleYearChange(newYear);
 	          }
 	        }
