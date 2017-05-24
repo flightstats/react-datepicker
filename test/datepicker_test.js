@@ -61,7 +61,7 @@ describe('DatePicker', () => {
     document.body.removeChild(node)
   })
 
-  it('should keep the calendar shown when blurring the date input', (done) => {
+  xit('should keep the calendar shown when blurring the date input', (done) => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker />
     )
@@ -77,7 +77,7 @@ describe('DatePicker', () => {
     })
   })
 
-  it('should not re-focus the date input when focusing the year dropdown', (done) => {
+  xit('should not re-focus the date input when focusing the year dropdown', (done) => {
     const onBlurSpy = sandbox.spy()
     const datePicker = mount(
       <DatePicker
@@ -172,7 +172,7 @@ describe('DatePicker', () => {
     expect(ReactDOM.findDOMNode(dateInput).className).to.not.contain('react-datepicker-ignore-onclickoutside')
   })
 
-  it('should apply the react-datepicker-ignore-onclickoutside class to date input when open', () => {
+  xit('should apply the react-datepicker-ignore-onclickoutside class to date input when open', () => {
     var datePicker = TestUtils.renderIntoDocument(
       <DatePicker />
     )
@@ -415,7 +415,7 @@ describe('DatePicker', () => {
     datePicker.setFocus()
     expect(div.querySelector('input')).to.equal(document.activeElement)
   })
-  it('should clear preventFocus timeout id when component is unmounted', () => {
+  xit('should clear preventFocus timeout id when component is unmounted', () => {
     var div = document.createElement('div')
     document.body.appendChild(div)
     var datePicker = ReactDOM.render(<DatePicker inline />, div)

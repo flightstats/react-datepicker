@@ -25,11 +25,13 @@ export default class Calendar extends React.Component {
       PropTypes.string,
       PropTypes.array
     ]).isRequired,
+    dateFormatCalendar: PropTypes.string,
     dropdownMode: PropTypes.oneOf(['scroll', 'select']).isRequired,
     endDate: PropTypes.object,
     excludeDates: PropTypes.array,
     filterDate: PropTypes.func,
     fixedHeight: PropTypes.bool,
+    handleInputChange: PropTypes.func,
     highlightDates: PropTypes.array,
     includeDates: PropTypes.array,
     inline: PropTypes.bool,
@@ -68,20 +70,27 @@ export default class Calendar extends React.Component {
 
   constructor (props) {
     super(props)
+
+    const date = this.localizeMoment(this.getDateInView())
     this.state = {
-      date: this.localizeMoment(this.getDateInView()),
-      selectingDate: null
+      date,
+      selectingDate: null,
+      inputYear: date.format('Y')
     }
   }
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.preSelection && !isSameDay(nextProps.preSelection, this.props.preSelection)) {
+      const date = this.localizeMoment(nextProps.preSelection)
       this.setState({
-        date: this.localizeMoment(nextProps.preSelection)
+        date,
+        inputYear: date.format('Y')
       })
     } else if (nextProps.openToDate && !isSameDay(nextProps.openToDate, this.props.openToDate)) {
+      const date = this.localizeMoment(nextProps.openToDate)
       this.setState({
-        date: this.localizeMoment(nextProps.openToDate)
+        date,
+        inputYear: date.format('Y')
       })
     }
   }
@@ -135,6 +144,26 @@ export default class Calendar extends React.Component {
     }, () => this.handleMonthChange(this.state.date))
   }
 
+  handleYearChange = (newYear) => {
+    const updatedYear = this.state.date.clone().set('year', newYear)
+    const { onMonthChange, handleInputChange, dateFormat } = this.props
+    this.setState({
+      date: updatedYear
+    }, () => {
+      if (onMonthChange) {
+        onMonthChange(updatedYear)
+      }
+      if (handleInputChange) {
+        const fakeEvent = {
+          target: {
+            value: this.state.date.format(dateFormat)
+          }
+        }
+        this.props.handleInputChange(fakeEvent)
+      }
+    })
+  }
+
   handleDayClick = (day, event) => this.props.onSelect(day, event)
 
   handleDayMouseEnter = day => this.setState({ selectingDate: day })
@@ -144,6 +173,38 @@ export default class Calendar extends React.Component {
   handleMonthChange = (date) => {
     if (this.props.onMonthChange) {
       this.props.onMonthChange(date)
+    }
+  }
+
+  handleYearInputChange = (e) => {
+    let {value} = (e && e.target)
+    const newYear = +value
+
+    if (!isNaN(newYear)) {
+      const momentizedNewYear = this.state.date.clone().set('year', newYear)
+      this.setState({
+        inputYear: momentizedNewYear.format('Y')
+      }, () => {
+        if (newYear > 999 && newYear < 10000) {
+          // update acalendar on years that are four digits long
+          const { minDate, maxDate } = this.props
+          const validMinCheck = minDate && minDate.isBefore(momentizedNewYear)
+          const validMaxCheck = maxDate && maxDate.isAfter(momentizedNewYear)
+          if (!minDate && !maxDate) {
+            // no constraints on calendar
+            this.handleYearChange(newYear)
+          } else if (validMinCheck && validMaxCheck) {
+            // both constraints present and passing
+            this.handleYearChange(newYear)
+          } else if (minDate && validMinCheck) {
+            // good min
+            this.handleYearChange(newYear)
+          } else if (maxDate && validMaxCheck) {
+            // good max
+            this.handleYearChange(newYear)
+          }
+        }
+      })
     }
   }
 
@@ -197,7 +258,7 @@ export default class Calendar extends React.Component {
         onClick={this.increaseMonth} />
   }
 
-  renderCurrentMonth = (date = this.state.date) => {
+  renderCurrentMonthHeader = (date = this.state.date) => {
     const classes = ['react-datepicker__current-month']
 
     if (this.props.showYearDropdown) {
@@ -208,7 +269,13 @@ export default class Calendar extends React.Component {
     }
     return (
       <div className={classes.join(' ')}>
-        {date.format(this.props.dateFormat)}
+        <div>
+          {date.format(this.props.dateFormatCalendar)}
+        </div>
+        <input
+            type="text"
+            value={this.state.inputYear}
+            onChange={this.handleYearInputChange}/>
       </div>
     )
   }
@@ -263,7 +330,7 @@ export default class Calendar extends React.Component {
       monthList.push(
           <div key={monthKey} className="react-datepicker__month-container">
             <div className="react-datepicker__header">
-              {this.renderCurrentMonth(monthDate)}
+              {this.renderCurrentMonthHeader(monthDate)}
               <div
                   className={`react-datepicker__header__dropdown react-datepicker__header__dropdown--${this.props.dropdownMode}`}
                   onFocus={this.handleDropdownFocus}>
